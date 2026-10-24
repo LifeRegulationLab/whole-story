@@ -157,10 +157,19 @@ export function Today() {
         </Card>
       ) : null}
 
+      {circle.careFor.length === 1 && circle.careFor[0] === 'other' ? (
+        <Card>
+          <p>
+            Helplines and papers are set for England for now. When you have a minute, say what is happening for {circle.personName} and where
+            they live in <Link to="/me" className="underline">Me</Link>, so they fit.
+          </p>
+        </Card>
+      ) : null}
+
       {!data.about ? (
         <Card>
           <p>
-            Start with <Link to="/them/about" className="underline">About {circle.personName}</Link>. Ten minutes now fills the hospital passport,
+            When you are ready, <Link to="/them/about" className="underline">About {circle.personName}</Link> fills the hospital passport,
             respite handover and care home papers later.
           </p>
         </Card>
