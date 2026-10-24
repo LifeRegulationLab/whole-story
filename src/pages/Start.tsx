@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router';
 import { Card, Text } from '../components/ui';
 import { firebaseConfigured } from '../lib/firebase/app';
 import { createCircle, joinWithCode, passwordSignIn, resetPassword } from '../lib/firebase/account';
+import { socialSignIn, type Social } from '../lib/firebase/social';
 import type { CareFor, Circle, Region } from '../lib/model/types';
 import { DEVICE_KEYS, newId, useStore } from '../lib/store/StoreProvider';
 import { deviceStorage } from '../lib/store/local';
@@ -23,6 +24,15 @@ export function Start() {
   const [isNew, setIsNew] = useState(true);
   const [note, setNote] = useState('');
   const needsAccount = firebaseConfigured() && !store.user;
+
+  const social = async (which: Social) => {
+    setBusy(true);
+    setError('');
+    const e = await socialSignIn(which);
+    setBusy(false);
+    if (e) return setError(e);
+    if (deviceStorage().getItem(DEVICE_KEYS.circle)) navigate('/signin');
+  };
 
   const account = async () => {
     setBusy(true);
@@ -84,10 +94,17 @@ export function Start() {
       {needsAccount ? (
         <Card className="flex flex-col gap-3">
           <h2 className="font-semibold">{isNew ? 'Make your account' : 'Sign in'}</h2>
+          <button className="btn btn-primary" disabled={busy} onClick={() => void social('apple')}>
+            Continue with Apple
+          </button>
+          <button className="btn" disabled={busy} onClick={() => void social('google')}>
+            Continue with Google
+          </button>
+          <p className="muted text-center text-sm">or with your email</p>
           <Text label="Your email address" type="email" value={email} onChange={setEmail} />
           <Text label="Password" {...(isNew ? { hint: 'At least 8 characters.' } : {})} type="password" value={password} onChange={setPassword} />
           {error ? <p className="warnbox">{error}</p> : null}
-          <button className="btn btn-primary" disabled={!email.includes('@') || password.length < (isNew ? 8 : 1) || busy} onClick={() => void account()}>
+          <button className="btn" disabled={!email.includes('@') || password.length < (isNew ? 8 : 1) || busy} onClick={() => void account()}>
             {isNew ? 'Make my account' : 'Sign in'}
           </button>
           <button className="btn" onClick={() => setIsNew(!isNew)}>
