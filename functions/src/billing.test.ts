@@ -1,10 +1,18 @@
 import { createHmac } from 'node:crypto';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { isTester, planChange, stripeForm, verifyStripeSignature } from './billing';
 
 const sign = (body: string, secret: string, t: number) => `t=${t},v1=${createHmac('sha256', secret).update(`${t}.${body}`).digest('hex')}`;
 
 describe('billing', () => {
+  it('is the same logic in the payment functions', () => {
+    const here = readFileSync(join(__dirname, 'billing.ts'), 'utf8');
+    const copy = readFileSync(join(__dirname, '../../billing/src/billing.ts'), 'utf8');
+    expect(copy.split('\n').slice(1).join('\n')).toBe(here);
+  });
+
   it('accepts a correctly signed Stripe event and rejects others', () => {
     const body = '{"type":"x"}';
     expect(verifyStripeSignature(body, sign(body, 'whsec_a', 1000), 'whsec_a', 1010)).toBe(true);

@@ -82,7 +82,8 @@ function MeForm() {
                   Open Ask
                 </Link>
               ) : null}
-              <div className="mt-2 border-t border-[var(--line)] pt-3">
+              {import.meta.env['VITE_PLUS_ON'] === 'true' || plus ? (
+                <div className="mt-2 border-t border-[var(--line)] pt-3">
                 <h3 className="font-semibold">Whole Story Plus</h3>
                 {plus ? (
                   <>
@@ -101,7 +102,8 @@ function MeForm() {
                 )}
                 {billingNote ? <p className="warnbox mt-2">{billingNote}</p> : null}
                 {thanks ? <p className="muted mt-2 text-sm">Payment done. Plus switches on within a minute.</p> : null}
-              </div>
+                </div>
+              ) : null}
             </>
           ) : (
             <Link to="/start" className="btn btn-primary">

@@ -44,10 +44,13 @@ Functions: `checkout` (opens Stripe's payment page), `portal` (change card or ca
 
 Before deploying those three:
 1. In Stripe, make a product "Whole Story Plus" with a monthly price. Put its `price_...` id in
-   `STRIPE_PRICE_ID` in functions/.env.
+   `STRIPE_PRICE_ID` in billing/.env.
 2. Add a webhook endpoint `https://europe-west2-whole-story-lrl.cloudfunctions.net/stripeWebhook`
    for `checkout.session.completed`, `customer.subscription.updated` and `customer.subscription.deleted`.
 3. Put the secret key and the webhook signing secret in Secret Manager as `STRIPE_SECRET_KEY` and
    `STRIPE_WEBHOOK_SECRET`. Keys never go in the repo or in chat.
 
-Until then deploy only the helper: `firebase deploy --only hosting,firestore:rules,functions:helper`.
+The payment functions are a separate set (billing/), so the helper deploys without them:
+`firebase deploy --only hosting,firestore:rules,functions:default`. Once Stripe is set up, set
+`STRIPE_PRICE_ID` in billing/.env and `VITE_PLUS_ON=true` in .env.production, then
+`npm --prefix billing ci` and `firebase deploy --only hosting,functions:billing`.

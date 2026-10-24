@@ -1,0 +1,20 @@
+{
+  "name": "whole-story-billing",
+  "private": true,
+  "author": "Stuart Houlihan",
+  "main": "lib/index.js",
+  "engines": {
+    "node": "22"
+  },
+  "scripts": {
+    "copy-logic": "node -e \"const f=require('fs');f.writeFileSync('src/billing.ts','// Copied from functions/src/billing.ts by \\\"npm run copy-logic\\\". Do not edit here; a test checks the two match.\\n'+f.readFileSync('../functions/src/billing.ts','utf8'))\"",
+    "build": "tsc -p ."
+  },
+  "dependencies": {
+    "firebase-admin": "^13.5.0",
+    "firebase-functions": "^6.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

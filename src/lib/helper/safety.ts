@@ -92,11 +92,28 @@ export function checkReply(text: string): ReplyCheck {
   return { ok: true, text: trimmed.replace(/!+/g, '.').replace(/\.{2,}/g, '.') };
 }
 
+export const ABOUT_TEXT = [
+  'I answer everyday questions about caring for someone. For example:',
+  '- ideas for hard moments, such as refusing to wash, not sleeping or getting upset in the evening',
+  '- who to ask for what: GP, social services, the council, carers centres, charities',
+  '- carer’s assessments, respite, care homes and continuing healthcare',
+  '- benefits forms such as Attendance Allowance, PIP and Carer’s Allowance, and what to write',
+  '- looking after yourself as a carer',
+  'I do not answer questions about medicines, and I am not for emergencies: call 999.',
+].join('\n');
+
+/** Questions about the helper itself get a fixed answer, without the model. */
+export function aboutCheck(text: string): boolean {
+  const t = normalise(text);
+  return /\b(what|how) (can|do|could|will) you (do|help|answer)\b|\bwhat are you( for)?\b|\bwho are you\b|\bwhat can i ask\b|\bhow does this work\b/.test(t);
+}
+
 /** What happens to a message before it is sent. */
 export type Gate = { send: true } | { send: false; reply: string; support: boolean };
 
 export function gate(text: string): Gate {
   if (distressCheck(text)) return { send: false, reply: SUPPORT_TEXT, support: true };
   if (medicineCheck(text)) return { send: false, reply: MEDICINE_TEXT, support: false };
+  if (aboutCheck(text)) return { send: false, reply: ABOUT_TEXT, support: false };
   return { send: true };
 }
