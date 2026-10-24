@@ -14,6 +14,7 @@ import { Start } from './pages/Start';
 import { AboutThem, Contacts, Crisis, KeptPapers, Them } from './pages/Them';
 import { Medicines } from './pages/Medicines';
 import { Since } from './pages/Requests';
+import { AppointmentPage, Appointments } from './pages/Appointments';
 import { Today } from './pages/Today';
 
 function NeedsCircle({ children }: { children: ReactNode }) {
@@ -47,6 +48,8 @@ export function App() {
             <Route path="them/medicines" element={<Medicines />} />
             <Route path="them/crisis" element={<Crisis />} />
             <Route path="them/contacts" element={<Contacts />} />
+            <Route path="them/appointments" element={<Appointments />} />
+            <Route path="them/appointments/:id" element={<AppointmentPage />} />
             <Route path="them/papers" element={<KeptPapers />} />
             <Route path="family" element={<Family />} />
             <Route path="since" element={<Since />} />

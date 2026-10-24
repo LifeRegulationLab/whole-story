@@ -16,6 +16,7 @@ export function Them() {
     { to: '/them/about', title: `About ${circle.personName}`, note: `${filled} of ${ABOUT_SECTIONS.length} parts written`, show: sees.about },
     { to: '/them/medicines', title: 'Medicines', note: `${data.medicines.filter((m) => !m.stopped).length} current`, show: sees.medicines },
     { to: '/them/crisis', title: 'Crisis plan', note: data.crisis ? `Updated ${formatDate(data.crisis.updatedAt)}` : 'Not written yet', show: sees.about },
+    { to: '/them/appointments', title: 'Appointments', note: `${data.appointments.length} written`, show: sees.log },
     { to: '/them/contacts', title: 'Who’s who', note: `${data.contacts.length} people and services`, show: true },
     { to: '/them/papers', title: 'Where papers are kept', note: `${data.papers.length} written down`, show: sees.papers },
   ];

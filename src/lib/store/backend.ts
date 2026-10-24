@@ -3,7 +3,7 @@
  * shared Firebase database (an account, family can join). Screens only ever see this interface.
  */
 
-export const COLLECTIONS = ['entries', 'doses', 'medicines', 'contacts', 'papers', 'tasks', 'cover', 'messages', 'requests', 'asks'] as const;
+export const COLLECTIONS = ['entries', 'doses', 'medicines', 'contacts', 'papers', 'tasks', 'cover', 'messages', 'requests', 'asks', 'appointments'] as const;
 export type Collection = (typeof COLLECTIONS)[number];
 
 /** Records that belong to the carer alone and are never shared with the circle. */

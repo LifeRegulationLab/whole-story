@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState, t
 import type { User } from 'firebase/auth';
 import type {
   About,
+  Appointment,
   Carer,
   CheckIn,
   Circle,
@@ -46,6 +47,7 @@ export interface Data {
   messages: Message[];
   requests: HelpRequest[];
   asks: SavedAsk[];
+  appointments: Appointment[];
   checkins: CheckIn[];
   about: About | undefined;
   crisis: CrisisPlan | undefined;
@@ -62,6 +64,7 @@ const EMPTY: Data = {
   messages: [],
   requests: [],
   asks: [],
+  appointments: [],
   checkins: [],
   about: undefined,
   crisis: undefined,
