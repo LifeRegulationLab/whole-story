@@ -1,0 +1,106 @@
+rules_version = '2';
+
+// Whole Story. A circle is one cared-for person and the people helping. Only members can read it;
+// the lead carer decides what each relative sees. A carer's own check-ins are theirs alone.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function circleData(cid) { return get(/databases/$(database)/documents/circles/$(cid)).data; }
+    function isMember(cid) { return signedIn() && request.auth.uid in circleData(cid).memberIds; }
+    function me(cid) { return circleData(cid).members[request.auth.uid]; }
+    function isLead(cid) { return isMember(cid) && me(cid).role == 'lead'; }
+    function sees(cid, what) { return isMember(cid) && (me(cid).role == 'lead' || me(cid).sees[what] == true); }
+    function canWrite(cid) { return isMember(cid) && me(cid).role in ['lead', 'family']; }
+    function inviteFor(code) { return get(/databases/$(database)/documents/invites/$(code)).data; }
+
+    match /users/{uid} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+      match /checkins/{id} {
+        allow read, write: if signedIn() && request.auth.uid == uid;
+      }
+    }
+
+    match /invites/{code} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && isLead(request.resource.data.circleId);
+      allow delete: if signedIn()
+        && (resource.data.createdBy == request.auth.uid || request.auth.uid in circleData(resource.data.circleId).memberIds);
+    }
+
+    match /circles/{cid} {
+      function joining() {
+        let m = request.resource.data.members[request.auth.uid];
+        let invite = inviteFor(m.invite);
+        return signedIn()
+          && !(request.auth.uid in resource.data.memberIds)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberIds'])
+          && request.resource.data.members.diff(resource.data.members).affectedKeys().hasOnly([request.auth.uid])
+          && request.resource.data.memberIds.hasAll(resource.data.memberIds)
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() + 1
+          && request.auth.uid in request.resource.data.memberIds
+          && m.uid == request.auth.uid
+          && invite.circleId == cid
+          && invite.role == m.role
+          && invite.role != 'lead'
+          && invite.sees == m.sees
+          && invite.expiresAt > request.time.toMillis();
+      }
+      function leaving() {
+        return signedIn()
+          && request.auth.uid in resource.data.memberIds
+          && resource.data.members[request.auth.uid].role != 'lead'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['members', 'memberIds'])
+          && request.resource.data.members.diff(resource.data.members).affectedKeys().hasOnly([request.auth.uid])
+          && !(request.auth.uid in request.resource.data.memberIds)
+          && request.resource.data.memberIds.size() == resource.data.memberIds.size() - 1;
+      }
+
+      allow read: if signedIn() && request.auth.uid in resource.data.memberIds;
+      allow create: if signedIn()
+        && request.resource.data.createdBy == request.auth.uid
+        && request.resource.data.memberIds == [request.auth.uid]
+        && request.resource.data.members[request.auth.uid].role == 'lead';
+      allow update: if isLead(cid) || joining() || leaving();
+      allow delete: if isLead(cid);
+
+      match /docs/{name} {
+        allow read: if sees(cid, name == 'about' ? 'about' : 'log');
+        allow write: if canWrite(cid);
+      }
+      match /entries/{id} {
+        allow read: if sees(cid, 'log');
+        allow write: if canWrite(cid);
+      }
+      match /medicines/{id} {
+        allow read: if sees(cid, 'medicines');
+        allow write: if canWrite(cid);
+      }
+      match /doses/{id} {
+        allow read: if sees(cid, 'medicines');
+        allow write: if canWrite(cid);
+      }
+      match /papers/{id} {
+        allow read: if sees(cid, 'papers');
+        allow write: if canWrite(cid);
+      }
+      match /contacts/{id} {
+        allow read: if isMember(cid);
+        allow write: if canWrite(cid);
+      }
+      // Anyone in the circle can talk, take a cover slot or tick off a task.
+      match /messages/{id} {
+        allow read: if isMember(cid);
+        allow create: if isMember(cid) && request.resource.data.by == request.auth.uid;
+        allow delete: if isMember(cid) && (resource.data.by == request.auth.uid || isLead(cid));
+      }
+      match /cover/{id} {
+        allow read, write: if isMember(cid);
+      }
+      match /tasks/{id} {
+        allow read, write: if isMember(cid);
+      }
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "Whole Story",
+  "short_name": "Whole Story",
+  "description": "For family carers: write down what happens, know what to try, and make the papers services ask for.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f4f1ea",
+  "theme_color": "#f4f1ea",
+  "lang": "en-GB",
+  "icons": [{ "src": "/icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}
