@@ -1,6 +1,6 @@
 # The Ask helper
 
-Off by default, in the build (`VITE_HELPER_ON`) and for each carer (Me > Switch on the Ask helper).
+Switched on in the live build from 24 October 2026 (`VITE_HELPER_ON`, `functions/.env`). Each carer still chooses it in Me > Switch on the Ask helper.
 Everything else in the app works without it.
 
 ## What it is for
