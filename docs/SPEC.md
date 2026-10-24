@@ -38,7 +38,7 @@ breaks. So Whole Story saves to the device first, every time, and works with no 
 | Medicines, and as-needed doses especially | Label copied word for word; due today; give a dose with warnings from the label's gap and daily limit; "did it help" asked later | Medisafe, MyTherapy, CareLineLive | Warn, never block, never suggest a dose; helped rate shown to the GP |
 | I can't see the patterns | Fixed-rule patterns (time of day, day of week, what seemed behind it, what helped) after three notes | Few | Counted, never interpreted |
 | Family don't help, or don't know how | Invite with a code; per-person view settings; messages; requests for help from saved asks in the carer's words, each followed through asked, accepted, done and confirmed by the carer; only the About sections the carer ticks go with a request; when nobody says yes after a day (or the day is close) the carer chooses: ask the next person, ask everyone, or move it; "Since you were last here" for a helper; a weekly update to send | Jointly, Lotsa, ianacare, Caily | The main carer controls who sees what, and the app never messages anyone on its own |
-| I'm shut out by services | Calls and appointments logged with what was agreed and reference numbers; "Your part in their care" | None | Builds a record the carer can quote |
+| I'm shut out by services | Calls and appointments logged with what was agreed and reference numbers; an appointment page (before: questions, the person's own words kept apart from what the carer noticed; in the room: one question at a time, answered or still unclear; after: what was said, what happens next and who, a calendar file, saved to the log); "Your part in their care" | None | Builds a record the carer can quote |
 | I don't know who does what | Who to ask for what, by region, including Guernsey | Jointly (guides) | Short, local, checked every six months |
 | I'm going under | Private daily check-in in the carer's own four words; Me page; nudge to a carer's assessment after repeated hard days | Few | Never shared, never scored |
 | When things go wrong, nobody has a plan | Crisis plan written with the person, early signs logged in one tap, crisis plan PDF | None for families | Their wishes in their words |
@@ -46,7 +46,7 @@ breaks. So Whole Story saves to the device first, every time, and works with no 
 
 ## Screens
 
-Today, Log, Them (About, Medicines, Crisis plan, Who's who, Where papers are kept), Family, Papers,
+Today, Log, Them (About, Medicines, Crisis plan, Appointments, Who's who, Where papers are kept), Family, Papers,
 Help, Me, and Now on every screen. Ask appears in Help only when the helper is on.
 
 ## Rules that do not bend

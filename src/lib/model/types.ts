@@ -249,3 +249,33 @@ export interface HelpRequest {
   createdBy: string;
   createdName: string;
 }
+
+/**
+ * An appointment, from getting ready to what happens next. The person's own words are kept apart
+ * from what the carer has noticed, so nobody mixes them up in the room.
+ */
+export interface Appointment {
+  id: string;
+  /** Who it is with, such as "Memory clinic" or "Dr Shah". */
+  with: string;
+  /** Local "YYYY-MM-DDTHH:MM", if known. */
+  when?: string;
+  where?: string;
+  /** What the person wants to say or ask, in their words. */
+  theirWords?: string;
+  /** What the carer has noticed, in plain words. */
+  noticed?: string;
+  questions: { id: string; text: string; status?: 'answered' | 'unclear'; answer?: string }[];
+  /** What was said in the room, as the carer remembers it. */
+  said?: string;
+  /** What the person said in the room, kept apart. */
+  theySaid?: string;
+  /** Who is doing what next. */
+  next: { id: string; what: string; who?: string; by?: string }[];
+  nextWhen?: string;
+  reference?: string;
+  /** The log entry made from it, once saved there. */
+  entryId?: string;
+  createdBy: string;
+  updatedAt: number;
+}
