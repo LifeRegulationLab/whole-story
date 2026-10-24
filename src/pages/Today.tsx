@@ -6,6 +6,7 @@ import { formatDate } from '../lib/logic/summaries';
 import type { CheckIn, Dose } from '../lib/model/types';
 import { newId, useAuthor, useStore } from '../lib/store/StoreProvider';
 import { now as clock, useNow } from '../lib/time';
+import { RequestList } from './Requests';
 
 export const QUICK = [
   { kind: 'happened', text: 'Something happened' },
@@ -19,7 +20,7 @@ export const QUICK = [
 const HOUR = 60 * 60 * 1000;
 
 export function Today() {
-  const { circle, data, save, carer, canWrite } = useStore();
+  const { circle, data, save, carer, canWrite, shared, isLead } = useStore();
   const author = useAuthor();
   const now = useNow();
   if (!circle) return null;
@@ -114,6 +115,17 @@ export function Today() {
           </div>
         </Card>
       ) : null}
+
+      {shared && !isLead ? (
+        <Card>
+          <Link to="/since" className="font-semibold underline">
+            Since you were last here
+          </Link>
+          <p className="muted text-sm">What has changed, before you start.</p>
+        </Card>
+      ) : null}
+
+      <RequestList mine />
 
       {cover.length > 0 ? (
         <Card>

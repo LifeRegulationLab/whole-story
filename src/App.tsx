@@ -13,6 +13,7 @@ import { SignIn } from './pages/SignIn';
 import { Start } from './pages/Start';
 import { AboutThem, Contacts, Crisis, KeptPapers, Them } from './pages/Them';
 import { Medicines } from './pages/Medicines';
+import { Since } from './pages/Requests';
 import { Today } from './pages/Today';
 
 function NeedsCircle({ children }: { children: ReactNode }) {
@@ -48,6 +49,7 @@ export function App() {
             <Route path="them/contacts" element={<Contacts />} />
             <Route path="them/papers" element={<KeptPapers />} />
             <Route path="family" element={<Family />} />
+            <Route path="since" element={<Since />} />
             <Route path="papers" element={<Papers />} />
             <Route path="papers/:kind" element={<PaperMaker />} />
             <Route path="help" element={<Help />} />

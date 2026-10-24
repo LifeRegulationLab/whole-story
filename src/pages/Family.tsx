@@ -7,6 +7,7 @@ import { formatDate, formatDateTime, weeklyUpdate } from '../lib/logic/summaries
 import type { CoverRequest, Member, Message, Role, Task } from '../lib/model/types';
 import { shareText } from '../lib/shell';
 import { newId, useAuthor, useStore } from '../lib/store/StoreProvider';
+import { AskForHelp, RequestList } from './Requests';
 
 /** Sharing the load: who is in, messages, cover for a break, jobs, and a weekly update. */
 export function Family() {
@@ -18,7 +19,7 @@ export function Family() {
     return (
       <Page title="Family">
         <Card className="flex flex-col gap-3">
-          <p>Everything is on this phone only. To let family see what you choose, ask for cover or share jobs, make a free account.</p>
+          <p>Everything is on this phone only. To let family see what you choose, or ask them for help, make a free account.</p>
           <p className="muted text-sm">
             You decide what each person sees: the log, medicines, About {circle.personName}, papers. Your own check-ins are never shared.
           </p>
@@ -60,9 +61,12 @@ export function Family() {
         </ul>
       </Card>
       {isLead ? <InviteCard /> : null}
+      {store.canWrite ? <AskForHelp /> : null}
+      <RequestList />
       <Messages />
-      <Cover />
-      <Tasks />
+      {/* Cover and jobs from before requests; shown only while old ones remain. */}
+      {data.cover.length ? <Cover /> : null}
+      {data.tasks.length ? <Tasks /> : null}
       {isLead ? <WeeklyUpdate /> : null}
       {data.messages.length === 0 && members.length === 1 ? (
         <Empty>Invite someone with a code. They download the app, make an account and type the code.</Empty>

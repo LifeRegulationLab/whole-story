@@ -210,3 +210,42 @@ export interface Carer {
   someone?: string;
   helperOn: boolean;
 }
+
+/** A saved request in the carer's own words, so asking for help takes two taps. */
+export interface SavedAsk {
+  id: string;
+  text: string;
+}
+
+/**
+ * One request for help. Every request moves through the same states: asked, accepted, done, and
+ * confirmed by the person who asked. The app never sends anything on its own; when nobody says
+ * yes, the carer chooses what happens next.
+ */
+export type RequestState = 'asked' | 'accepted' | 'done' | 'confirmed';
+
+export interface HelpRequest {
+  id: string;
+  what: string;
+  /** "YYYY-MM-DD", if it is for a day. */
+  day?: string;
+  /** Free words for the time, such as "10 till 2" or "morning". */
+  time?: string;
+  note?: string;
+  /** A member's uid, or 'everyone'. */
+  askedOf: string;
+  askedName?: string;
+  /** When it was last put to someone, for "nobody has said yes yet". */
+  askedAt: number;
+  /** People asked by name who said they could not. */
+  cannot?: string[];
+  state: RequestState;
+  acceptedBy?: string;
+  acceptedName?: string;
+  /** Copies of the About sections the carer ticked, so the helper sees only those. */
+  howToHelp?: { title: string; text: string }[];
+  changedAt: number;
+  changedName: string;
+  createdBy: string;
+  createdName: string;
+}

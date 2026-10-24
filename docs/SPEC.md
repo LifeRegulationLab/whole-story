@@ -37,7 +37,7 @@ breaks. So Whole Story saves to the device first, every time, and works with no 
 | Benefit and CHC forms are impossible | Every note can be tagged with areas of life; packs group examples under the 12 CHC domains or the form's headings, with nights and days counted; family views section; caring hours by week against 35 hours | None found | Nothing scored; the carer's own examples where the assessor looks |
 | Medicines, and as-needed doses especially | Label copied word for word; due today; give a dose with warnings from the label's gap and daily limit; "did it help" asked later | Medisafe, MyTherapy, CareLineLive | Warn, never block, never suggest a dose; helped rate shown to the GP |
 | I can't see the patterns | Fixed-rule patterns (time of day, day of week, what seemed behind it, what helped) after three notes | Few | Counted, never interpreted |
-| Family don't help, or don't know how | Invite with a code; per-person view settings; messages; cover requests for a break; jobs; a weekly update to send | Jointly, Lotsa, ianacare, Caily | The main carer controls who sees what |
+| Family don't help, or don't know how | Invite with a code; per-person view settings; messages; requests for help from saved asks in the carer's words, each followed through asked, accepted, done and confirmed by the carer; only the About sections the carer ticks go with a request; when nobody says yes after a day (or the day is close) the carer chooses: ask the next person, ask everyone, or move it; "Since you were last here" for a helper; a weekly update to send | Jointly, Lotsa, ianacare, Caily | The main carer controls who sees what, and the app never messages anyone on its own |
 | I'm shut out by services | Calls and appointments logged with what was agreed and reference numbers; "Your part in their care" | None | Builds a record the carer can quote |
 | I don't know who does what | Who to ask for what, by region, including Guernsey | Jointly (guides) | Short, local, checked every six months |
 | I'm going under | Private daily check-in in the carer's own four words; Me page; nudge to a carer's assessment after repeated hard days | Few | Never shared, never scored |
@@ -58,6 +58,7 @@ cards, carer as author of every file, offline first, private check-ins.
 
 - Uploading photos of letters (needs Firebase Storage on Blaze). Papers record where things are kept.
 - Reminders and notifications on the phone.
+- A view for the person being supported. It changes who the app is for, so it waits for a decision.
 - Sign-in links opening straight into the iPhone app (the web link works; app links come with the App Store build).
 - Ask helper switched on (see `docs/AI-HELPER.md`).
 - Welsh and other languages.
