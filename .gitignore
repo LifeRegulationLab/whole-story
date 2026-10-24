@@ -4,7 +4,10 @@ dist
 .env.local
 functions/lib
 functions/node_modules
+billing/lib
+billing/node_modules
 .firebase
 *.log
 .DS_Store
 !functions/.env
+!billing/.env

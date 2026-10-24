@@ -14,6 +14,7 @@ export const SYSTEM = [
   'Never give doses, never suggest starting, stopping or changing a medicine, never diagnose, never name a stage or condition the person might have. Say "ask the GP or pharmacist" instead.',
   'If anyone may be in danger, say to call 999. If the carer may be in crisis, give Samaritans 116 123.',
   'Never claim to be a person or a professional. Keep answers under 200 words.',
+  'Do not use the words dose, dosage, diagnose or diagnosis at all, even to say what you will not do. For medicine questions say "the GP or pharmacist can help with medicines".',
 ].join('\n');
 
 export const PLUS_TEXT = 'Ask is part of Whole Story Plus. Everything else in the app stays free.';
@@ -84,10 +85,15 @@ export async function handleHelper(request: Request, deps: HelperDeps): Promise<
   ];
   try {
     const r = await deps.model(SYSTEM, messages);
-    if (r.refused) return send(200, { text: CANNOT_ANSWER });
+    if (r.refused) {
+      console.error('helper: the model refused');
+      return send(200, { text: CANNOT_ANSWER });
+    }
     const checked = checkReply(r.text);
+    if (!checked.ok) console.error('helper: reply held back by the safety check');
     return send(200, { text: checked.ok ? checked.text : CANNOT_ANSWER });
-  } catch {
+  } catch (e) {
+    console.error('helper: model call failed', e instanceof Error ? e.message : e);
     return send(502, { text: 'The helper is not available just now. Try again later.' });
   }
 }
