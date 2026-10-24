@@ -12,7 +12,7 @@ import { handleHelper } from './helper';
 initializeApp();
 const MODEL_KEY = defineSecret('MODEL_API_KEY');
 const HELPER_ON = defineString('HELPER_ON', { default: 'false' });
-const ORIGINS = defineString('HELPER_ORIGINS', { default: 'https://whole-story-lrl.web.app,capacitor://localhost' });
+const ORIGINS = defineString('HELPER_ORIGINS', { default: 'https://whole-story-lrl.web.app,https://whole-story-lrl.firebaseapp.com,capacitor://localhost' });
 const MODEL = 'claude-sonnet-5-5';
 
 export const helper = onRequest({ region: 'europe-west2', secrets: [MODEL_KEY], maxInstances: 5, timeoutSeconds: 60 }, async (req, res) => {
