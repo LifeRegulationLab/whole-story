@@ -10,9 +10,11 @@ import type {
   CrisisPlan,
   Dose,
   Entry,
+  HelpRequest,
   Medicine,
   Message,
   Paper,
+  SavedAsk,
   Task,
 } from '../model/types';
 import { firebaseConfigured, firebase } from '../firebase/app';
@@ -42,6 +44,8 @@ export interface Data {
   tasks: Task[];
   cover: CoverRequest[];
   messages: Message[];
+  requests: HelpRequest[];
+  asks: SavedAsk[];
   checkins: CheckIn[];
   about: About | undefined;
   crisis: CrisisPlan | undefined;
@@ -56,6 +60,8 @@ const EMPTY: Data = {
   tasks: [],
   cover: [],
   messages: [],
+  requests: [],
+  asks: [],
   checkins: [],
   about: undefined,
   crisis: undefined,

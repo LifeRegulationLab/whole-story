@@ -107,6 +107,18 @@ service cloud.firestore {
       match /tasks/{id} {
         allow read, write: if isMember(cid);
       }
+      // Requests for help: anyone in the circle can say yes, mark done or be asked.
+      match /requests/{id} {
+        allow read: if isMember(cid);
+        allow create: if canWrite(cid) && request.resource.data.createdBy == request.auth.uid;
+        allow update: if isMember(cid) && request.resource.data.createdBy == resource.data.createdBy;
+        allow delete: if isMember(cid) && (resource.data.createdBy == request.auth.uid || isLead(cid));
+      }
+      // The carer's saved requests, in their own words.
+      match /asks/{id} {
+        allow read: if isMember(cid);
+        allow write: if canWrite(cid);
+      }
     }
   }
 }
