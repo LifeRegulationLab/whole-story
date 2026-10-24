@@ -59,6 +59,35 @@ function MeForm() {
 
   return (
     <Page title={`Me${c.name ? `: ${c.name}` : ''}`} back="/">
+      {helperAvailable() ? (
+        <Card className="flex flex-col gap-2">
+          <h2 className="font-semibold">Ask helper</h2>
+          <p className="muted text-sm">Ask everyday caring questions and get plain answers. It never gives medical advice.</p>
+          {user ? (
+            <>
+              <button
+                className={carer.helperOn ? 'btn' : 'btn btn-primary'}
+                onClick={() => {
+                  const next = { ...carer, helperOn: !carer.helperOn };
+                  setC({ ...c, helperOn: next.helperOn });
+                  void store.saveCarer(next);
+                }}
+              >
+                {carer.helperOn ? 'Switch Ask off' : 'Switch Ask on'}
+              </button>
+              {carer.helperOn ? (
+                <Link to="/ask" className="btn">
+                  Open Ask
+                </Link>
+              ) : null}
+            </>
+          ) : (
+            <Link to="/signin" className="btn btn-primary">
+              Sign in to use Ask
+            </Link>
+          )}
+        </Card>
+      ) : null}
       <Card>
         <h2 className="mb-1 font-semibold">How you have been</h2>
         <p className="muted mb-2 text-sm">Only you see this. It is never shared with family.</p>
@@ -123,12 +152,6 @@ function MeForm() {
             ))}
           </div>
         </fieldset>
-        {helperAvailable() ? (
-          <label className="flex items-center gap-2">
-            <input type="checkbox" checked={c.helperOn} onChange={(e) => setC({ ...c, helperOn: e.target.checked })} />
-            Switch on the Ask helper
-          </label>
-        ) : null}
         <button className="btn btn-primary" onClick={() => void store.saveCarer(c)}>
           Save
         </button>

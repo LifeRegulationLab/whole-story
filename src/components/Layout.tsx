@@ -7,6 +7,7 @@ const TABS = [
   { to: '/family', label: 'Family' },
   { to: '/papers', label: 'Papers' },
   { to: '/help', label: 'Help' },
+  { to: '/me', label: 'Me' },
 ] as const;
 
 /** Bottom tabs, and the Now button on every screen so help is one tap away. */
