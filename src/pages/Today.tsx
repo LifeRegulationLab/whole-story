@@ -42,11 +42,6 @@ export function Today() {
   return (
     <Page
       title={`Today with ${circle.personName}`}
-      actions={
-        <Link to="/me" className="btn text-sm">
-          Me
-        </Link>
-      }
     >
       {canWrite ? (
         <Card>
