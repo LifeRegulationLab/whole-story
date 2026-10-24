@@ -20,6 +20,12 @@ service cloud.firestore {
       }
     }
 
+    // Whole Story Plus. Only the server writes plans, from Stripe's signed messages.
+    match /plans/{uid} {
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow write: if false;
+    }
+
     match /invites/{code} {
       allow read: if signedIn();
       allow create: if signedIn()

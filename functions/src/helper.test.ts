@@ -8,6 +8,7 @@ const deps = (over: Partial<HelperDeps> = {}): HelperDeps => ({
   on: 'true',
   origins: ['https://whole-story-lrl.web.app'],
   verifyUser: async (t) => (t === 'good' ? 'u1' : undefined),
+  hasPlus: async () => true,
   model: vi.fn(async () => ({ text: 'Ask the council for a carer’s assessment!', refused: false })),
   ...over,
 });
@@ -28,6 +29,14 @@ describe('helper server', () => {
 
   it('is off unless switched on', async () => {
     expect((await handleHelper(post({ question: 'hi' }), deps({ on: undefined }))).status).toBe(503);
+  });
+
+  it('needs Plus, and never calls the model without it', async () => {
+    const d = deps({ hasPlus: async () => false });
+    const r = await handleHelper(post({ question: 'Who do I ask about a carer’s assessment?' }), d);
+    expect(r.status).toBe(402);
+    expect(((await r.json()) as { plus?: boolean }).plus).toBe(true);
+    expect(d.model).not.toHaveBeenCalled();
   });
 
   it('needs a sign-in', async () => {

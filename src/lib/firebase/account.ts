@@ -1,8 +1,11 @@
 import {
+  createUserWithEmailAndPassword,
   deleteUser,
   isSignInWithEmailLink,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   sendSignInLinkToEmail,
+  signInWithEmailAndPassword,
   signInWithEmailLink,
   signOut as fbSignOut,
   type User,
@@ -14,6 +17,7 @@ import {
   doc,
   getDoc,
   getDocs,
+  onSnapshot,
   query,
   setDoc,
   updateDoc,
@@ -42,6 +46,31 @@ export async function finishLink(emailIfAsked?: string): Promise<'done' | 'need-
   await signInWithEmailLink(auth, email, window.location.href);
   window.localStorage.removeItem(EMAIL_KEY);
   return 'done';
+}
+
+/**
+ * Email and password. This works inside the app on a phone's home screen, where an emailed link
+ * would open the browser instead. Returns an error to show, if any.
+ */
+export async function passwordSignIn(email: string, password: string, isNew: boolean): Promise<string | undefined> {
+  const { auth } = firebase();
+  try {
+    if (isNew) await createUserWithEmailAndPassword(auth, email, password);
+    else await signInWithEmailAndPassword(auth, email, password);
+    return undefined;
+  } catch (e) {
+    const code = (e as { code?: string }).code ?? '';
+    if (code.includes('email-already-in-use')) return 'There is already an account for that email. Choose "I have an account".';
+    if (code.includes('weak-password')) return 'Use at least 8 characters.';
+    if (code.includes('invalid-email')) return 'Check the email address.';
+    if (code.includes('invalid-credential') || code.includes('wrong-password') || code.includes('user-not-found')) return 'That email and password do not match.';
+    if (code.includes('network')) return 'No signal. Try again when you have one.';
+    return 'That did not work. Try again.';
+  }
+}
+
+export async function resetPassword(email: string): Promise<void> {
+  await sendPasswordResetEmail(firebase().auth, email);
 }
 
 export function watchUser(onChange: (user: User | null) => void): () => void {
@@ -187,4 +216,31 @@ export async function deleteEverything(user: User): Promise<void> {
   for (const d of checkins.docs) await deleteDoc(d.ref);
   await deleteDoc(doc(db, 'users', user.uid));
   await deleteUser(user);
+}
+
+/** Whether this carer has Whole Story Plus. Only the server writes plans. */
+export function watchPlan(uid: string, onChange: (active: boolean) => void): () => void {
+  return onSnapshot(
+    doc(firebase().db, 'plans', uid),
+    (d) => onChange(d.data()?.['active'] === true),
+    () => onChange(false),
+  );
+}
+
+/** Opens Stripe's page to buy Plus ('checkout') or to change or cancel it ('portal'). Returns an error to show, if any. */
+export async function openBilling(which: 'checkout' | 'portal'): Promise<string | undefined> {
+  const user = firebase().auth.currentUser;
+  const url = import.meta.env[which === 'checkout' ? 'VITE_CHECKOUT_URL' : 'VITE_PORTAL_URL'];
+  if (!user || !url) return 'Plus is not on sale yet.';
+  try {
+    const res = await fetch(String(url), { method: 'POST', headers: { authorization: `Bearer ${await user.getIdToken()}` } });
+    const body = (await res.json().catch(() => ({}))) as { url?: string; text?: string };
+    if (res.ok && body.url) {
+      window.location.assign(body.url);
+      return undefined;
+    }
+    return body.text ?? 'That did not open. Try again later.';
+  } catch {
+    return 'No signal. Try again when you have one.';
+  }
 }

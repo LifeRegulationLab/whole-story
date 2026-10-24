@@ -2,7 +2,7 @@ import { CANNOT_ANSWER, checkReply, distressCheck, gate, SUPPORT_TEXT } from './
 
 /**
  * The Ask helper's server. It is a plain function of a web Request so it can be tested without
- * Firebase. In order: the switch, the sign-in, the request's shape, the safety gate on every
+ * Firebase. In order: the switch, the sign-in, the Plus plan, the request's shape, the safety gate on every
  * message from the carer (the model is not called if it catches one), the model, the reply check.
  * Nothing is stored.
  */
@@ -16,10 +16,14 @@ export const SYSTEM = [
   'Never claim to be a person or a professional. Keep answers under 200 words.',
 ].join('\n');
 
+export const PLUS_TEXT = 'Ask is part of Whole Story Plus. Everything else in the app stays free.';
+
 export interface HelperDeps {
   on: string | undefined;
   origins: readonly string[];
   verifyUser: (token: string) => Promise<string | undefined>;
+  /** Whether this carer has Whole Story Plus (or is a tester). */
+  hasPlus: (uid: string) => Promise<boolean>;
   model: (system: string, messages: { role: 'user' | 'assistant'; content: string }[]) => Promise<{ text: string; refused: boolean }>;
 }
 
@@ -50,7 +54,7 @@ function cors(request: Request, origins: readonly string[]): Record<string, stri
 }
 
 export async function handleHelper(request: Request, deps: HelperDeps): Promise<Response> {
-  const send = (status: number, body: { text: string; support?: boolean }) =>
+  const send = (status: number, body: { text: string; support?: boolean; plus?: boolean }) =>
     new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json', 'cache-control': 'no-store', ...cors(request, deps.origins) } });
   if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors(request, deps.origins) });
   if (deps.on !== 'true') return send(503, { text: 'The helper is not switched on.' });
@@ -60,6 +64,7 @@ export async function handleHelper(request: Request, deps: HelperDeps): Promise<
   const token = header.startsWith('Bearer ') ? header.slice(7).trim() : '';
   const uid = token ? await deps.verifyUser(token) : undefined;
   if (!uid) return send(401, { text: 'Sign in to use the helper.' });
+  if (!(await deps.hasPlus(uid))) return send(402, { text: PLUS_TEXT, plus: true });
 
   let parsed: HelperRequest | undefined;
   try {

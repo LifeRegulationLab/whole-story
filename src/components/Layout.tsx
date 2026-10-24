@@ -1,4 +1,6 @@
 import { NavLink, Outlet, Link } from 'react-router';
+import { firebaseConfigured } from '../lib/firebase/app';
+import { useStore } from '../lib/store/StoreProvider';
 
 const TABS = [
   { to: '/', label: 'Today', end: true },
@@ -12,8 +14,18 @@ const TABS = [
 
 /** Bottom tabs, and the Now button on every screen so help is one tap away. */
 export function Layout() {
+  const { user } = useStore();
   return (
     <div className="min-h-dvh">
+      {!user && firebaseConfigured() ? (
+        <div className="bg-[var(--panel)] px-4 py-2 pr-24 text-sm">
+          You are looking around.{' '}
+          <Link to="/start" className="underline">
+            Make an account
+          </Link>{' '}
+          to keep what you write and share it with family.
+        </div>
+      ) : null}
       <Link
         to="/now"
         className="btn btn-accent fixed right-4 z-20 shadow-lg"

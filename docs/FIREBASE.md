@@ -33,3 +33,21 @@ in chat or files), set `HELPER_ON=true`, deploy with `--only functions`, then bu
 
 Deleting an account deletes every circle the person leads, with all its records, and removes them
 from any other circle.
+
+## Whole Story Plus (Stripe)
+
+Ask is part of Plus. Everything else stays free. Plans live in `plans/{uid}`, written only by the
+server. Testers in `PLUS_TESTERS` (functions/.env) always have Plus.
+
+Functions: `checkout` (opens Stripe's payment page), `portal` (change card or cancel) and
+`stripeWebhook` (Stripe tells us when Plus starts or ends).
+
+Before deploying those three:
+1. In Stripe, make a product "Whole Story Plus" with a monthly price. Put its `price_...` id in
+   `STRIPE_PRICE_ID` in functions/.env.
+2. Add a webhook endpoint `https://europe-west2-whole-story-lrl.cloudfunctions.net/stripeWebhook`
+   for `checkout.session.completed`, `customer.subscription.updated` and `customer.subscription.deleted`.
+3. Put the secret key and the webhook signing secret in Secret Manager as `STRIPE_SECRET_KEY` and
+   `STRIPE_WEBHOOK_SECRET`. Keys never go in the repo or in chat.
+
+Until then deploy only the helper: `firebase deploy --only hosting,firestore:rules,functions:helper`.
