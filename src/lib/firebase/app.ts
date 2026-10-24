@@ -1,5 +1,6 @@
 import { initializeApp, type FirebaseApp } from 'firebase/app';
-import { getAuth, type Auth } from 'firebase/auth';
+import { getAuth, indexedDBLocalPersistence, initializeAuth, type Auth } from 'firebase/auth';
+import { inShell } from '../shell';
 import {
   initializeFirestore,
   persistentLocalCache,
@@ -38,6 +39,8 @@ export function firebase(): { app: FirebaseApp; auth: Auth; db: Firestore } {
   } catch {
     db = initializeFirestore(app, {});
   }
-  cached = { app, auth: getAuth(app), db };
+  // Inside the iPhone app the web sign-in helpers (pop-ups, iframes) are left out; they hang there.
+  const auth = inShell() ? initializeAuth(app, { persistence: indexedDBLocalPersistence }) : getAuth(app);
+  cached = { app, auth, db };
   return cached;
 }
