@@ -30,6 +30,7 @@ export async function ask(question: string, context: string[], history: Turn[]):
       headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
       body: JSON.stringify({ question, context, history: history.slice(-6) }),
     });
+    if (res.status === 402) return { role: 'helper', text: 'Ask is part of Whole Story Plus. You can get it in Me.' };
     if (!res.ok) return { role: 'helper', text: CANNOT_ANSWER };
     const body = (await res.json()) as { text?: string; support?: boolean };
     if (body.support) return { role: 'helper', text: body.text ?? '', support: true };

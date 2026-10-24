@@ -1,10 +1,11 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Card, Text } from '../components/ui';
 import { firebaseConfigured } from '../lib/firebase/app';
-import { createCircle, joinWithCode } from '../lib/firebase/account';
+import { createCircle, joinWithCode, passwordSignIn, resetPassword } from '../lib/firebase/account';
 import type { CareFor, Circle, Region } from '../lib/model/types';
-import { newId, useStore } from '../lib/store/StoreProvider';
+import { DEVICE_KEYS, newId, useStore } from '../lib/store/StoreProvider';
+import { deviceStorage } from '../lib/store/local';
 
 /**
  * First open: one optional box, then straight into the app. The rest (what is happening for them,
@@ -17,6 +18,21 @@ export function Start() {
   const [code, setCode] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isNew, setIsNew] = useState(true);
+  const [note, setNote] = useState('');
+  const needsAccount = firebaseConfigured() && !store.user;
+
+  const account = async () => {
+    setBusy(true);
+    setError('');
+    const e = await passwordSignIn(email.trim(), password, isNew);
+    setBusy(false);
+    if (e) return setError(e);
+    // Notes made while looking around are offered for moving into the new account.
+    if (deviceStorage().getItem(DEVICE_KEYS.circle)) navigate('/signin');
+  };
 
   const open = async (personName: string) => {
     setBusy(true);
@@ -65,17 +81,48 @@ export function Start() {
         <li>Make the papers services ask for: hospital passport, GP summary, respite handover, continuing healthcare and benefit evidence.</li>
         <li>Share the load with family, if you want to.</li>
       </ul>
+      {needsAccount ? (
+        <Card className="flex flex-col gap-3">
+          <h2 className="font-semibold">{isNew ? 'Make your account' : 'Sign in'}</h2>
+          <Text label="Your email address" type="email" value={email} onChange={setEmail} />
+          <Text label="Password" {...(isNew ? { hint: 'At least 8 characters.' } : {})} type="password" value={password} onChange={setPassword} />
+          {error ? <p className="warnbox">{error}</p> : null}
+          <button className="btn btn-primary" disabled={!email.includes('@') || password.length < (isNew ? 8 : 1) || busy} onClick={() => void account()}>
+            {isNew ? 'Make my account' : 'Sign in'}
+          </button>
+          <button className="btn" onClick={() => setIsNew(!isNew)}>
+            {isNew ? 'I have an account' : 'I need an account'}
+          </button>
+          {!isNew ? (
+            <button
+              className="text-left text-sm underline"
+              disabled={!email.includes('@')}
+              onClick={() => void resetPassword(email.trim()).then(() => setNote('A link to set a new password is on its way.'), () => setNote('That did not send. Check the email address.'))}
+            >
+              Forgotten your password?
+            </button>
+          ) : null}
+          {note ? <p className="muted text-sm">{note}</p> : null}
+          <p className="muted text-sm">Your notes are kept safe in your account, so nothing is lost if you change phone. Family only see what you choose to share.</p>
+          <button className="btn" disabled={busy} onClick={() => void open('Mum')}>
+            Just look around first
+          </button>
+        </Card>
+      ) : (
       <Card className="flex flex-col gap-3">
         <Text label="What do you call the person you look after?" hint="A first name or what the family calls them, such as Mum." value={person} onChange={setPerson} />
         {error ? <p className="warnbox">{error}</p> : null}
         <button className="btn btn-primary" disabled={!person.trim() || busy} onClick={() => void open(person.trim())}>
           Open the app
         </button>
-        <button className="btn" disabled={busy} onClick={() => void open('Mum')}>
-          Just look around first
-        </button>
-        <p className="muted text-sm">No account needed. Nothing leaves this phone until you choose to share it. You can change everything later.</p>
+        {!store.user ? (
+          <button className="btn" disabled={busy} onClick={() => void open('Mum')}>
+            Just look around first
+          </button>
+        ) : null}
+        <p className="muted text-sm">You can change this and add more later in Me.</p>
       </Card>
+      )}
       {store.user ? (
         <Card className="flex flex-col gap-3">
           <h2 className="font-semibold">Joining someone else’s family?</h2>
@@ -84,10 +131,6 @@ export function Start() {
             Join
           </button>
         </Card>
-      ) : firebaseConfigured() ? (
-        <Link to="/signin" className="btn">
-          Sign in, or join a family with a code
-        </Link>
       ) : null}
     </main>
   );

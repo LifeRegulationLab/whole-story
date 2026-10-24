@@ -16,7 +16,7 @@ import type {
   Task,
 } from '../model/types';
 import { firebaseConfigured, firebase } from '../firebase/app';
-import { loadCarer, myCircles, saveCarer, watchUser, type CircleWithMembers } from '../firebase/account';
+import { loadCarer, myCircles, saveCarer, watchPlan, watchUser, type CircleWithMembers } from '../firebase/account';
 import { SharedBackend } from '../firebase/shared';
 import { COLLECTIONS, newId, PRIVATE, type Backend, type Collection, type DocName, type PrivateCollection } from './backend';
 import { deviceStorage, LocalBackend } from './local';
@@ -76,6 +76,8 @@ export interface StoreValue {
   device: LocalBackend;
   canWrite: boolean;
   isLead: boolean;
+  /** Has Whole Story Plus, which opens Ask. Testers have it through the server, not here. */
+  plus: boolean;
   save: <T extends { id: string }>(collection: Collection | PrivateCollection, item: T) => Promise<void>;
   remove: (collection: Collection | PrivateCollection, id: string) => Promise<void>;
   saveDoc: <T>(name: DocName, value: T) => Promise<void>;
@@ -113,6 +115,11 @@ export function StoreProvider({ children }: { children: ReactNode }) {
   );
   const [circles, setCircles] = useState<CircleWithMembers[]>([]);
   const [activeId, setActiveId] = useState<string | undefined>(() => deviceStorage().getItem(ACTIVE_CIRCLE) ?? undefined);
+  const [plan, setPlan] = useState<{ uid: string; active: boolean } | undefined>();
+  useEffect(() => {
+    if (!user) return;
+    return watchPlan(user.uid, (active) => setPlan({ uid: user.uid, active }));
+  }, [user]);
   const [held, setHeld] = useState<{ owner: Backend | null; data: Data }>({ owner: null, data: EMPTY });
 
   useEffect(() => {
@@ -177,6 +184,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     device,
     canWrite: role === 'lead' || role === 'family',
     isLead: role === 'lead',
+    plus: Boolean(user && plan?.uid === user.uid && plan.active),
     save: (collection, item) => backend.save(collection, item),
     remove: (collection, id) => backend.remove(collection, id),
     saveDoc: (name, v) => backend.saveDoc(name, v),

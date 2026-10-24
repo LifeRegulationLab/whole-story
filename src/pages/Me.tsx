@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router';
 import { Card, Chips, Choice, Page, Text, toggle } from '../components/ui';
 import { AGE_BANDS, CARE_FOR, REGIONS } from '../lib/content/setup';
 import { firebaseConfigured } from '../lib/firebase/app';
-import { deleteEverything, signOut, updateCircle } from '../lib/firebase/account';
+import { deleteEverything, openBilling, signOut, updateCircle } from '../lib/firebase/account';
 import { helperAvailable } from '../lib/helper/client';
 import { formatDate } from '../lib/logic/summaries';
 import type { Carer, Circle } from '../lib/model/types';
@@ -22,7 +22,9 @@ export function Me() {
 
 function MeForm() {
   const store = useStore();
-  const { carer, data, user, circle, shared, isLead, circles } = store;
+  const { carer, data, user, circle, shared, isLead, circles, plus } = store;
+  const [billingNote, setBillingNote] = useState('');
+  const thanks = new URLSearchParams(window.location.search).get('plus') === 'thanks';
   const navigate = useNavigate();
   const [c, setC] = useState<Carer>(carer);
   const [newHelp, setNewHelp] = useState('');
@@ -61,7 +63,7 @@ function MeForm() {
     <Page title={`Me${c.name ? `: ${c.name}` : ''}`} back="/">
       {helperAvailable() ? (
         <Card className="flex flex-col gap-2">
-          <h2 className="font-semibold">Ask helper</h2>
+          <h2 className="font-semibold">Ask</h2>
           <p className="muted text-sm">Ask everyday caring questions and get plain answers. It never gives medical advice.</p>
           {user ? (
             <>
@@ -80,10 +82,30 @@ function MeForm() {
                   Open Ask
                 </Link>
               ) : null}
+              <div className="mt-2 border-t border-[var(--line)] pt-3">
+                <h3 className="font-semibold">Whole Story Plus</h3>
+                {plus ? (
+                  <>
+                    <p className="muted text-sm">You have Plus. Thank you.</p>
+                    <button className="btn mt-2" onClick={() => void openBilling('portal').then((e) => setBillingNote(e ?? ''))}>
+                      Change card or cancel Plus
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <p className="muted text-sm">Ask is part of Plus, paid monthly, cancel any time. Everything else in the app stays free.</p>
+                    <button className="btn btn-primary mt-2" onClick={() => void openBilling('checkout').then((e) => setBillingNote(e ?? ''))}>
+                      Get Plus
+                    </button>
+                  </>
+                )}
+                {billingNote ? <p className="warnbox mt-2">{billingNote}</p> : null}
+                {thanks ? <p className="muted mt-2 text-sm">Payment done. Plus switches on within a minute.</p> : null}
+              </div>
             </>
           ) : (
-            <Link to="/signin" className="btn btn-primary">
-              Sign in to use Ask
+            <Link to="/start" className="btn btn-primary">
+              Make an account to use Ask
             </Link>
           )}
         </Card>
