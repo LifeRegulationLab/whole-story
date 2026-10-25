@@ -40,5 +40,6 @@ The iPhone and iPad app is the same web app in a Capacitor shell: `npm run build
 - `src/lib/papers/`: the documents and the PDF writer.
 - `src/lib/store/`: the device store and the shared Firestore store behind one interface.
 - `src/lib/helper/` and `functions/`: the Ask helper, off by default (see `docs/AI-HELPER.md`).
+- `src/lib/moss/`, `src/components/Moss.tsx`, `src/components/MossCard.tsx`: Moss, the face of Ask shared with the other Life Regulation Lab apps. It shows ready or thinking. In Me the carer can rename it, stop it moving, and optionally connect it to an existing Mull or Pace account with an email code (never makes an account). Only Moss's name and movement are shared; nothing from the log, medicines or papers is sent, and the Whole Story account is untouched.
 - `firestore.rules`: who can read and write what.
 - `docs/`: the spec and feature map, Firebase set-up, helper rules, content checks.

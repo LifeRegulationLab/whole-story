@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { MossCard } from '../components/MossCard';
 import { Card, Chips, Choice, Page, Text, toggle } from '../components/ui';
 import { AGE_BANDS, CARE_FOR, REGIONS } from '../lib/content/setup';
 import { firebaseConfigured } from '../lib/firebase/app';
 import { deleteEverything, openBilling, signOut, updateCircle } from '../lib/firebase/account';
 import { helperAvailable } from '../lib/helper/client';
+import { moss } from '../lib/moss/link';
 import { formatDate } from '../lib/logic/summaries';
 import type { Carer, Circle } from '../lib/model/types';
 import { COLLECTIONS, PRIVATE } from '../lib/store/backend';
@@ -54,6 +56,7 @@ function MeForm() {
       }
     }
     store.device.clear([...COLLECTIONS, ...PRIVATE, 'doc:about', 'doc:crisis']);
+    await moss.disconnect();
     deviceStorage().removeItem(DEVICE_KEYS.circle);
     deviceStorage().removeItem(DEVICE_KEYS.carer);
     window.location.assign('/start');
@@ -196,6 +199,8 @@ function MeForm() {
       </Card>
 
       {isLead ? <CircleSettings circle={circle} /> : null}
+
+      <MossCard />
 
       <Card className="flex flex-col gap-3">
         <h2 className="font-semibold">Account and records</h2>
