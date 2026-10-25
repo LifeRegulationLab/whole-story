@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Moss } from '../components/Moss';
 import { Card, Page } from '../components/ui';
 import { CARE_FOR } from '../lib/content/setup';
 import { ask, helperAvailable, type Turn } from '../lib/helper/client';
@@ -71,9 +72,12 @@ export function Ask() {
         ))}
       </ul>
       <textarea className="field" aria-label="Your question" rows={3} value={text} onChange={(e) => setText(e.target.value)} />
-      <button className="btn btn-primary" disabled={busy || !text.trim()} onClick={() => void send()}>
-        {busy ? 'Thinking…' : 'Ask'}
-      </button>
+      <div className="flex items-center gap-3">
+        <Moss mood={busy ? 'thinking' : 'ready'} size={44} />
+        <button className="btn btn-primary flex-1" disabled={busy || !text.trim()} onClick={() => void send()}>
+          {busy ? 'Thinking…' : 'Ask'}
+        </button>
+      </div>
     </Page>
   );
 }
