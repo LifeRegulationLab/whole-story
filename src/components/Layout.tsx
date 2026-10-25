@@ -1,7 +1,9 @@
-import { NavLink, Outlet, Link } from 'react-router';
+import { NavLink, Outlet, Link, useLocation } from 'react-router';
 import { firebaseConfigured } from '../lib/firebase/app';
 import { useStore } from '../lib/store/StoreProvider';
 import { TabIcon } from './TabIcon';
+import { MossButton } from './MossCompanion';
+import { MOSS_ACTIONS, MOSS_SETTINGS } from '../lib/moss/actions';
 
 const TABS = [
   { to: '/', icon: 'today', label: 'Today', end: true },
@@ -16,8 +18,9 @@ const TABS = [
 /** Bottom tabs, and the Now button on every screen so help is one tap away. */
 export function Layout() {
   const { user } = useStore();
+  const { pathname } = useLocation();
   return (
-    <div className="min-h-dvh">
+    <div className="moss-lift-tabs min-h-dvh">
       {!user && firebaseConfigured() && import.meta.env['VITE_SHOWCASE'] !== 'true' ? (
         <div className="bg-[var(--panel)] px-4 py-2 pr-24 text-sm">
           You are looking around.{' '}
@@ -36,6 +39,7 @@ export function Layout() {
         Now
       </Link>
       <Outlet />
+      {pathname !== '/' && <MossButton actions={MOSS_ACTIONS} settingsTo={MOSS_SETTINGS} />}
       <nav
         aria-label="Main"
         className="fixed inset-x-0 bottom-0 z-10 border-t border-[var(--line)] bg-[var(--panel)]"

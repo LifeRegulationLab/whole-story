@@ -1,4 +1,6 @@
 import { Link } from 'react-router';
+import { MossHome } from '../components/MossCompanion';
+import { MOSS_ACTIONS, MOSS_SETTINGS } from '../lib/moss/actions';
 import { Card, Page } from '../components/ui';
 import { findPatterns } from '../lib/logic/patterns';
 import { dueToday } from '../lib/logic/prn';
@@ -44,6 +46,7 @@ export function Today() {
     <Page
       title={`Today with ${circle.personName}`}
     >
+      <MossHome actions={MOSS_ACTIONS} settingsTo={MOSS_SETTINGS} />
       {canWrite ? (
         <Card>
           <h2 className="mb-3 font-semibold">Write something down</h2>
