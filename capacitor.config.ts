@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appId: 'com.liferegulationlab.wholestory',
   appName: 'Whole Story',
   webDir: 'dist',
-  backgroundColor: '#f4f1ea',
+  backgroundColor: '#f2f7f5',
   plugins: {
     // Apple and Google sign-in use the phone's own sheets; the result is handed to the Firebase web SDK.
     FirebaseAuthentication: { skipNativeAuth: true, providers: ['apple.com', 'google.com'] },

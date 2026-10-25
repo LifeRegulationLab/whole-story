@@ -1,15 +1,16 @@
 import { NavLink, Outlet, Link } from 'react-router';
 import { firebaseConfigured } from '../lib/firebase/app';
 import { useStore } from '../lib/store/StoreProvider';
+import { TabIcon } from './TabIcon';
 
 const TABS = [
-  { to: '/', label: 'Today', end: true },
-  { to: '/log', label: 'Log' },
-  { to: '/them', label: 'Them' },
-  { to: '/family', label: 'Family' },
-  { to: '/papers', label: 'Papers' },
-  { to: '/help', label: 'Help' },
-  { to: '/me', label: 'Me' },
+  { to: '/', icon: 'today', label: 'Today', end: true },
+  { to: '/log', icon: 'log', label: 'Log' },
+  { to: '/them', icon: 'them', label: 'Them' },
+  { to: '/family', icon: 'family', label: 'Family' },
+  { to: '/papers', icon: 'papers', label: 'Papers' },
+  { to: '/help', icon: 'help', label: 'Help' },
+  { to: '/me', icon: 'me', label: 'Me' },
 ] as const;
 
 /** Bottom tabs, and the Now button on every screen so help is one tap away. */
@@ -17,7 +18,7 @@ export function Layout() {
   const { user } = useStore();
   return (
     <div className="min-h-dvh">
-      {!user && firebaseConfigured() ? (
+      {!user && firebaseConfigured() && import.meta.env['VITE_SHOWCASE'] !== 'true' ? (
         <div className="bg-[var(--panel)] px-4 py-2 pr-24 text-sm">
           You are looking around.{' '}
           <Link to="/start" className="underline">
@@ -43,6 +44,7 @@ export function Layout() {
         <div className="mx-auto flex max-w-2xl">
           {TABS.map((t) => (
             <NavLink key={t.to} to={t.to} end={'end' in t} className="tab">
+              <TabIcon name={t.icon} />
               {t.label}
             </NavLink>
           ))}
