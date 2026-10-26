@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Card, Text } from '../components/ui';
 import { firebaseConfigured } from '../lib/firebase/app';
-import { createCircle, joinWithCode, passwordSignIn, resetPassword } from '../lib/firebase/account';
+import { createCircle, joinWithCode, passwordSignIn, resetPassword, signOut } from '../lib/firebase/account';
 import { socialSignIn, type Social } from '../lib/firebase/social';
+import { signedInAs } from '../lib/firebase/who';
 import type { CareFor, Circle, Region } from '../lib/model/types';
 import { DEVICE_KEYS, newId, useStore } from '../lib/store/StoreProvider';
 import { deviceStorage } from '../lib/store/local';
@@ -127,6 +128,14 @@ export function Start() {
         </Card>
       ) : (
       <Card className="flex flex-col gap-3">
+        {store.user ? (
+          <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+            <p>{signedInAs(store.user)}</p>
+            <button className="underline" disabled={busy} onClick={() => void signOut()}>
+              Not you? Sign out
+            </button>
+          </div>
+        ) : null}
         <Text label="What do you call the person you look after?" hint="A first name or what the family calls them, such as Mum." value={person} onChange={setPerson} />
         {error ? <p className="warnbox">{error}</p> : null}
         <button className="btn btn-primary" disabled={!person.trim() || busy} onClick={() => void open(person.trim())}>
