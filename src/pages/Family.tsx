@@ -1,13 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { Card, Choice, Empty, Page, Text } from '../components/ui';
 import { firebaseConfigured } from '../lib/firebase/app';
-import { createInvite, removeMember, type Invite } from '../lib/firebase/account';
+import { createInvite, joinWithCode, removeMember, type Invite } from '../lib/firebase/account';
 import { formatDate, formatDateTime, weeklyUpdate } from '../lib/logic/summaries';
 import type { CoverRequest, Member, Message, Role, Task } from '../lib/model/types';
 import { shareText } from '../lib/shell';
 import { newId, useAuthor, useStore } from '../lib/store/StoreProvider';
 import { AskForHelp, RequestList } from './Requests';
+import { possessive } from '../lib/model/name';
 
 /** Sharing the load: who is in, messages, cover for a break, jobs, and a weekly update. */
 export function Family() {
@@ -37,6 +38,7 @@ export function Family() {
   const members = Object.values(shared.members).sort((a, b) => a.joinedAt - b.joinedAt);
   return (
     <Page title="Family">
+      <JoinFamily />
       <Card>
         <h2 className="mb-2 font-semibold">Who is in</h2>
         <ul className="flex flex-col gap-2">
@@ -136,7 +138,7 @@ function InviteCard() {
             onClick={() =>
               void shareText(
                 'Whole Story',
-                `I'm using Whole Story to keep track of ${circle.personName}'s care. Get the app, make an account, then type this code to join: ${invite.code}`,
+                `I'm using Whole Story to keep track of ${possessive(circle.personName)} care. Get the app, make an account, then type this code to join: ${invite.code}`,
               )
             }
           >
@@ -356,6 +358,42 @@ function WeeklyUpdate() {
           {said ? <p className="muted text-sm">{said}</p> : null}
         </>
       )}
+    </Card>
+  );
+}
+
+/** Joining a family someone else set up, with the code they sent. */
+function JoinFamily() {
+  const store = useStore();
+  const navigate = useNavigate();
+  const [code, setCode] = useState('');
+  const [error, setError] = useState('');
+  const [busy, setBusy] = useState(false);
+  if (!store.user) return null;
+  const uid = store.user.uid;
+  const join = async () => {
+    setBusy(true);
+    setError('');
+    try {
+      const id = await joinWithCode(code, uid, store.carer.name || 'Family');
+      await store.refreshCircles();
+      store.chooseCircle(id);
+      setCode('');
+      navigate('/');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'That code did not work.');
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <Card className="flex flex-col gap-3">
+      <h2 className="font-semibold">Joining someone else’s family?</h2>
+      <Text label="Code they sent you" value={code} onChange={setCode} />
+      {error ? <p className="warnbox">{error}</p> : null}
+      <button className="btn" disabled={code.trim().length < 6 || busy} onClick={() => void join()}>
+        Join
+      </button>
     </Card>
   );
 }

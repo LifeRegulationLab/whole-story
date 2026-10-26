@@ -1,6 +1,7 @@
 import { NEED_BY_CODE } from '../content/care';
 import type { CheckIn, Dose, Entry, Medicine } from '../model/types';
 import { bandOf, nightsPerWeek } from './patterns';
+import { possessive } from '../model/name';
 
 /**
  * Plain-language summaries built by fixed rules from the log. The same sections in the same order
@@ -112,7 +113,7 @@ export function gpSummary(
   out.push({
     heading: 'About these notes',
     lines: [
-      `Written by ${personName}'s family. They describe what was seen and heard; they are not a medical assessment.`,
+      `Written by ${possessive(personName)} family. They describe what was seen and heard; they are not a medical assessment.`,
     ],
   });
   return out;

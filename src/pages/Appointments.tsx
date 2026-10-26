@@ -9,6 +9,7 @@ import type { Appointment } from '../lib/model/types';
 import { saveFile, shareText } from '../lib/shell';
 import { newId, useAuthor, useStore } from '../lib/store/StoreProvider';
 import { useNow } from '../lib/time';
+import { possessive } from '../lib/model/name';
 
 /** Appointments: what to ask before, one question at a time in the room, and what happens next. */
 
@@ -29,7 +30,7 @@ export function Appointments() {
   return (
     <Page title="Appointments" back="/them">
       <p className="muted">
-        Write down what you want to ask, keep {circle.personName}’s own words apart from yours, and note what happens next.
+        Write down what you want to ask, keep {possessive(circle.personName, '’')} own words apart from yours, and note what happens next.
       </p>
       {canWrite ? (
         <button className="btn btn-primary" onClick={() => void add()}>

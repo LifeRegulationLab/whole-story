@@ -5,6 +5,7 @@ import { ABOUT_GROUPS, ABOUT_SECTIONS, HELP_SUGGESTIONS } from '../lib/content/c
 import { formatDate } from '../lib/logic/summaries';
 import type { About, Contact, CrisisPlan, Paper } from '../lib/model/types';
 import { newId, useStore } from '../lib/store/StoreProvider';
+import { capital } from '../lib/model/name';
 
 export function Them() {
   const { circle, data, shared, user } = useStore();
@@ -21,7 +22,7 @@ export function Them() {
     { to: '/them/papers', title: 'Where papers are kept', note: `${data.papers.length} written down`, show: sees.papers },
   ];
   return (
-    <Page title={circle.personName}>
+    <Page title={capital(circle.personName)}>
       {links
         .filter((l) => l.show)
         .map((l) => (

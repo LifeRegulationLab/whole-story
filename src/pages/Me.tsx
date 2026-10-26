@@ -13,6 +13,7 @@ import { COLLECTIONS, PRIVATE } from '../lib/store/backend';
 import { deviceStorage } from '../lib/store/local';
 import { saveFile } from '../lib/shell';
 import { DEVICE_KEYS, useStore } from '../lib/store/StoreProvider';
+import { possessive } from '../lib/model/name';
 
 const TEXT_KEY = 'whole-story:text-size';
 
@@ -232,7 +233,7 @@ function MeForm() {
         <button className="btn btn-warn" onClick={() => void wipe()}>
           {user ? 'Delete my account and records' : 'Delete everything on this phone'}
         </button>
-        {user && isLead ? <p className="muted text-xs">As the main carer, deleting your account deletes {circle.personName}’s records for everyone.</p> : null}
+        {user && isLead ? <p className="muted text-xs">As the main carer, deleting your account deletes {possessive(circle.personName, '’')} records for everyone.</p> : null}
       </Card>
       <p className="muted text-center text-xs">Whole Story by Life Regulation Lab</p>
     </Page>
