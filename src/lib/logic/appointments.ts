@@ -1,5 +1,6 @@
 import type { Appointment, Entry } from '../model/types';
 import { formatDateTime } from './summaries';
+import { possessive } from '../model/name';
 
 /**
  * Appointments: getting ready, the room, and what happens next. Everything leaves the app only
@@ -64,7 +65,7 @@ export function summaryText(a: Appointment, personName: string): string {
   const answered = a.questions.filter((q) => q.status === 'answered' && q.text.trim());
   const open = openQuestions(a);
   const out = [`Appointment with ${a.with}${at ? `, ${formatDateTime(at)}` : ''}`, ''];
-  out.push(...block(`In ${personName}'s own words`, a.theirWords));
+  out.push(...block(`In ${possessive(personName)} own words`, a.theirWords));
   out.push(...block('What I have noticed', a.noticed));
   if (answered.length) out.push('Answered', ...answered.map((q) => `- ${q.text}${q.answer?.trim() ? `: ${q.answer.trim()}` : ''}`), '');
   if (open.length) out.push('Still to ask or still unclear', ...open.map((q) => `- ${q.text}`), '');

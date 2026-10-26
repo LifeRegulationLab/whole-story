@@ -5,6 +5,7 @@ import { NEEDS } from '../lib/content/care';
 import { helplinesFor } from '../lib/content/help';
 import { DANGER_LINE, meCards, themCards, type NowCard } from '../lib/content/now';
 import { useStore } from '../lib/store/StoreProvider';
+import { isUnnamed } from '../lib/model/name';
 
 /** What to try right now. Fixed words, no signal needed, no AI. */
 export function Now() {
@@ -35,7 +36,7 @@ export function Now() {
       <p className="warnbox font-medium">{DANGER_LINE}</p>
       <div className="flex gap-2" role="tablist">
         <button role="tab" aria-selected={who === 'them'} className={`btn flex-1 ${who === 'them' ? 'btn-primary' : ''}`} onClick={() => setWho('them')}>
-          {circle.personName} is struggling
+          {isUnnamed(circle.personName) ? 'They are struggling' : `${circle.personName} is struggling`}
         </button>
         <button role="tab" aria-selected={who === 'me'} className={`btn flex-1 ${who === 'me' ? 'btn-primary' : ''}`} onClick={() => setWho('me')}>
           I am struggling

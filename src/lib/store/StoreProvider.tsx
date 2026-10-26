@@ -72,6 +72,8 @@ const EMPTY: Data = {
 
 export interface StoreValue {
   ready: boolean;
+  /** Signed out, or signed in with the account's circles read, so the app can choose where to open. */
+  loaded: boolean;
   /** Signed in to the shared database. */
   user: User | null;
   carer: Carer;
@@ -123,6 +125,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
       },
   );
   const [circles, setCircles] = useState<CircleWithMembers[]>([]);
+  const [circlesFor, setCirclesFor] = useState<string | undefined>();
   const [activeId, setActiveId] = useState<string | undefined>(() => deviceStorage().getItem(ACTIVE_CIRCLE) ?? undefined);
   const [plan, setPlan] = useState<{ uid: string; active: boolean } | undefined>();
   useEffect(() => {
@@ -143,6 +146,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     if (!user) return;
     const [list, stored] = await Promise.all([myCircles(user.uid).catch(() => []), loadCarer(user.uid).catch(() => undefined)]);
     setCircles(list);
+    setCirclesFor(user.uid);
     setCarerState((c) => stored ?? { ...c, uid: user.uid });
   }, [user]);
 
@@ -152,6 +156,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
     void Promise.all([myCircles(user.uid).catch(() => []), loadCarer(user.uid).catch(() => undefined)]).then(([list, stored]) => {
       if (!live) return;
       setCircles(list);
+      setCirclesFor(user.uid);
       setCarerState((c) => stored ?? { ...c, uid: user.uid });
     });
     return () => {
@@ -183,6 +188,7 @@ export function StoreProvider({ children }: { children: ReactNode }) {
 
   const value: StoreValue = {
     ready: authReady,
+    loaded: authReady && (!user || circlesFor === user.uid),
     user,
     carer,
     circle,

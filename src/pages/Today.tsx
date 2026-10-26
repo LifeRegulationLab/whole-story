@@ -1,8 +1,11 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { helpFromTask } from '../lib/logic/requests';
 import { MossHome } from '../components/MossCompanion';
 import { MOSS_ACTIONS, MOSS_SETTINGS } from '../lib/moss/actions';
-import { Card, Page } from '../components/ui';
+import { Card, Page, Text } from '../components/ui';
+import { updateCircle } from '../lib/firebase/account';
+import { isUnnamed } from '../lib/model/name';
 import { findPatterns } from '../lib/logic/patterns';
 import { dueToday } from '../lib/logic/prn';
 import { formatDate } from '../lib/logic/summaries';
@@ -47,6 +50,7 @@ export function Today() {
     <Page
       title={`Today with ${circle.personName}`}
     >
+      {isLead && isUnnamed(circle.personName) ? <AddTheirName /> : null}
       <MossHome actions={MOSS_ACTIONS} settingsTo={MOSS_SETTINGS} />
       {canWrite ? (
         <Card>
@@ -187,5 +191,43 @@ export function Today() {
         </Card>
       ) : null}
     </Page>
+  );
+}
+
+/** The one question the app used to ask before opening, now asked here and never in the way. */
+function AddTheirName() {
+  const store = useStore();
+  const [name, setName] = useState('');
+  const [error, setError] = useState('');
+  const circle = store.circle;
+  if (!circle) return null;
+  const save = async () => {
+    setError('');
+    try {
+      if (store.user && store.shared) {
+        await updateCircle(circle.id, { personName: name.trim() });
+        await store.refreshCircles();
+      } else store.setDeviceCircle({ ...circle, personName: name.trim() });
+    } catch {
+      setError('That did not save. Check the signal and try again.');
+    }
+  };
+  return (
+    <Card className="flex flex-col gap-3">
+      <Text label="What do you call the person you look after?" hint="A first name or what the family calls them, such as Mum." value={name} onChange={setName} />
+      {error ? <p className="warnbox">{error}</p> : null}
+      <button className="btn btn-primary" disabled={!name.trim()} onClick={() => void save()}>
+        Save
+      </button>
+      {store.user ? (
+        <p className="muted text-sm">
+          Joining someone else’s family? Type the code they sent you in{' '}
+          <Link to="/family" className="underline">
+            Family
+          </Link>
+          .
+        </p>
+      ) : null}
+    </Card>
   );
 }

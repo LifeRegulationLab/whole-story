@@ -6,6 +6,7 @@ import { prnHelped } from '../logic/prn';
 import { formatDate, formatDateTime, gpSummary, inPeriod } from '../logic/summaries';
 import type { About, Circle, Contact, CrisisPlan, Dose, Entry, Medicine, Paper } from '../model/types';
 import type { Doc, DocSection } from './pdf';
+import { capital, possessive } from '../model/name';
 
 /**
  * The documents a carer can make from what they have written. Every line comes from their own
@@ -224,7 +225,7 @@ export function buildDoc(kind: DocKind, i: PaperInput): Doc {
         .slice(0, 10);
       return {
         ...base,
-        title: `Handover for ${name}'s stay`,
+        title: `Handover for ${possessive(name)} stay`,
         subtitle: `From ${i.carerName || 'the family'}`,
         intro: 'Everything you need for a short stay. The family is happy to be called with any question.',
         sections: [
@@ -315,7 +316,7 @@ export function buildDoc(kind: DocKind, i: PaperInput): Doc {
     case 'crisis':
       return {
         ...base,
-        title: `${name}'s crisis plan`,
+        title: `${capital(possessive(name))} crisis plan`,
         subtitle: i.crisis ? `Updated ${formatDate(i.crisis.updatedAt)}` : 'Not written yet',
         sections: [...crisisSections(i.crisis), ...contactsSection(i)],
       };

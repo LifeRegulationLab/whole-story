@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router';
 import { Layout } from './components/Layout';
+import { signInFirst } from './lib/firebase/app';
 import { StoreProvider, useStore } from './lib/store/StoreProvider';
 import { Ask } from './pages/Ask';
 import { Family } from './pages/Family';
@@ -18,9 +19,10 @@ import { AppointmentPage, Appointments } from './pages/Appointments';
 import { Today } from './pages/Today';
 
 function NeedsCircle({ children }: { children: ReactNode }) {
-  const { ready, circle } = useStore();
-  if (!ready) return <p className="muted p-6">Opening…</p>;
-  if (!circle) return <Navigate to="/start" replace />;
+  const { loaded, user, circle } = useStore();
+  if (!loaded) return <p className="muted p-6">Opening…</p>;
+  // Sign-in comes first: nothing opens until there is an account.
+  if ((signInFirst() && !user) || !circle) return <Navigate to="/start" replace />;
   return children;
 }
 
