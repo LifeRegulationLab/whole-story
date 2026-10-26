@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link } from 'react-router';
+import { useEffect, useState } from 'react';
+import { Link, useSearchParams } from 'react-router';
 import { Card, Page, Text } from '../components/ui';
 import { ABOUT_SECTIONS } from '../lib/content/care';
 import {
@@ -17,6 +17,9 @@ import {
   nextPerson,
   nothingNew,
   notYet,
+  readHelpDraft,
+  helpLink,
+  type HelpDraft,
   sectionsFor,
   sinceLastHere,
   startingAsks,
@@ -41,10 +44,16 @@ function when(r: HelpRequest): string {
 export function AskForHelp() {
   const { circle, shared, data, save, remove, user } = useStore();
   const author = useAuthor();
-  const [what, setWhat] = useState('');
-  const [day, setDay] = useState('');
-  const [time, setTime] = useState('');
-  const [note, setNote] = useState('');
+  // Filled in from "Ask for help with this" on an appointment, a medicine or a job, to check first.
+  const [params] = useSearchParams();
+  const [draft] = useState(() => readHelpDraft(params));
+  const [what, setWhat] = useState(draft?.what ?? '');
+  const [day, setDay] = useState(draft?.day ?? '');
+  const [time, setTime] = useState(draft?.time ?? '');
+  const [note, setNote] = useState(draft?.note ?? '');
+  useEffect(() => {
+    if (draft) document.getElementById('ask-for-help')?.scrollIntoView({ block: 'start' });
+  }, [draft]);
   const [askedOf, setAskedOf] = useState('everyone');
   const [ticked, setTicked] = useState<string[]>([]);
   const [helps, setHelps] = useState(false);
@@ -97,7 +106,10 @@ export function AskForHelp() {
 
   return (
     <Card className="flex flex-col gap-3">
-      <h2 className="font-semibold">Ask for help</h2>
+      <h2 id="ask-for-help" className="font-semibold">
+        Ask for help
+      </h2>
+      {draft ? <p className="muted text-sm">Filled in for you. Check it and change anything before you tap Ask. Nothing is sent until then.</p> : null}
       <div className="flex flex-wrap gap-2">
         {saved.map((a) =>
           editing ? (
@@ -416,3 +428,12 @@ export function Since() {
   );
 }
 
+
+/** "Ask for help with this": opens Ask for help filled in from the thing it is on. */
+export function AskWithThis({ draft }: { draft: HelpDraft }) {
+  return (
+    <Link className="chip" to={helpLink(draft)}>
+      Ask for help with this
+    </Link>
+  );
+}

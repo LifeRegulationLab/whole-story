@@ -17,6 +17,11 @@ import {
   sectionsFor,
   sinceLastHere,
   nothingNew,
+  helpFromAppointment,
+  helpFromMedicine,
+  helpFromTask,
+  helpLink,
+  readHelpDraft,
 } from '../lib/logic/requests';
 import type { HelpRequest, Member } from '../lib/model/types';
 import { DAY, HOUR, NOW, entry } from './fixtures';
@@ -159,5 +164,50 @@ describe('requests for help', () => {
     expect(s.requests).toHaveLength(0);
     expect(nothingNew(s)).toBe(false);
     expect(nothingNew(sinceLastHere({ entries: [], doses: [], medicines: [], messages: [], requests: [], about: undefined }, since, 'u2'))).toBe(true);
+  });
+});
+
+describe('ask for help with this', () => {
+  const appt = {
+    id: 'a1',
+    with: 'Memory clinic',
+    when: '2026-11-03T10:30',
+    where: 'Riverside Health Centre',
+    theirWords: 'I keep losing my words',
+    noticed: 'Worse in the evenings',
+    questions: [],
+    next: [],
+    createdBy: 'u1',
+    updatedAt: NOW,
+  };
+
+  it('fills in what, when and where from an appointment, and nothing the carer or person wrote', () => {
+    const d = helpFromAppointment(appt, 'Mum');
+    expect(d).toEqual({ what: 'Go with Mum to Memory clinic', day: '2026-11-03', time: '10:30', note: 'At Riverside Health Centre' });
+    expect(JSON.stringify(d)).not.toMatch(/losing|evenings/);
+  });
+
+  it('asks to collect a medicine by name only, never its label or dose', () => {
+    const d = helpFromMedicine(
+      { id: 'm1', name: ' Donepezil ', label: 'Take ONE 10mg tablet at night', times: ['21:00'], asNeeded: false, addedAt: NOW },
+      'Mum',
+    );
+    expect(d).toEqual({ what: 'Collect Donepezil for Mum' });
+  });
+
+  it('takes a job and its date', () => {
+    expect(helpFromTask({ id: 't1', title: 'Ring the council', due: '2026-11-01', done: false, createdBy: 'u1' })).toEqual({
+      what: 'Ring the council',
+      day: '2026-11-01',
+    });
+  });
+
+  it('carries the draft to Ask for help and reads it back, ignoring a bad date', () => {
+    const link = helpLink(helpFromAppointment(appt, 'Mum'));
+    expect(link.startsWith('/family?')).toBe(true);
+    const params = new URLSearchParams(link.slice('/family?'.length).split('#')[0]);
+    expect(readHelpDraft(params)).toEqual(helpFromAppointment(appt, 'Mum'));
+    expect(readHelpDraft(new URLSearchParams('ask=Shop&day=tomorrow'))).toEqual({ what: 'Shop' });
+    expect(readHelpDraft(new URLSearchParams(''))).toBeUndefined();
   });
 });
