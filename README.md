@@ -19,6 +19,9 @@ It does three jobs:
 
 Family can join with a code. The main carer decides what each person sees. The carer's own
 check-ins are never shared.
+"Ask for help with this" on an appointment, a medicine or a job opens Ask for help with what
+needs doing and when filled in, to check before anything is sent. Only what the carer ticks goes
+with it.
 
 ## Running it
 

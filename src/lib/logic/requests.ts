@@ -1,4 +1,4 @@
-import type { About, Dose, Entry, HelpRequest, Medicine, Member, Message } from '../model/types';
+import type { About, Appointment, Dose, Entry, HelpRequest, Medicine, Member, Message, Task } from '../model/types';
 import { ABOUT_SECTIONS } from '../content/care';
 
 /**
@@ -163,4 +163,62 @@ export function sinceLastHere(
 
 export function nothingNew(s: SinceLastHere): boolean {
   return !s.entries.length && !s.given.length && !s.medicines.length && !s.messages.length && !s.requests.length && !s.aboutChanged;
+}
+
+/**
+ * "Ask for help with this" from an appointment, a medicine or a job: what needs doing and when,
+ * filled into Ask for help for the carer to check and change before anything is sent. Only these
+ * plain lines go in; the person's own words, what the carer noticed, the medicine label and doses
+ * never do. Anything more goes only through the boxes the carer ticks, as for every request.
+ */
+export interface HelpDraft {
+  what: string;
+  /** "YYYY-MM-DD". */
+  day?: string;
+  time?: string;
+  note?: string;
+}
+
+export function helpFromAppointment(a: Appointment, personName: string): HelpDraft {
+  const d: HelpDraft = { what: `Go with ${personName} to ${a.with.trim() || 'an appointment'}` };
+  if (a.when) {
+    d.day = a.when.slice(0, 10);
+    const time = a.when.slice(11, 16);
+    if (time) d.time = time;
+  }
+  if (a.where?.trim()) d.note = `At ${a.where.trim()}`;
+  return d;
+}
+
+export function helpFromMedicine(m: Medicine, personName: string): HelpDraft {
+  return { what: `Collect ${m.name.trim()} for ${personName}` };
+}
+
+export function helpFromTask(t: Task): HelpDraft {
+  const d: HelpDraft = { what: t.title.trim() };
+  if (t.due) d.day = t.due.slice(0, 10);
+  return d;
+}
+
+/** Ask for help on the Family page, filled in with the draft. */
+export function helpLink(d: HelpDraft): string {
+  const q = new URLSearchParams({ ask: d.what });
+  if (d.day) q.set('day', d.day);
+  if (d.time) q.set('time', d.time);
+  if (d.note) q.set('note', d.note);
+  return `/family?${q.toString()}#ask-for-help`;
+}
+
+/** The draft from a Family page link, or undefined without one. */
+export function readHelpDraft(params: URLSearchParams): HelpDraft | undefined {
+  const what = params.get('ask')?.trim();
+  if (!what) return undefined;
+  const d: HelpDraft = { what };
+  const day = params.get('day');
+  if (day && /^\d{4}-\d{2}-\d{2}$/.test(day)) d.day = day;
+  const time = params.get('time')?.trim();
+  if (time) d.time = time;
+  const note = params.get('note')?.trim();
+  if (note) d.note = note;
+  return d;
 }

@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Area as TextArea, Card, Empty, Page, Text } from '../components/ui';
 import { checkPrn, prnHelped } from '../lib/logic/prn';
+import { helpFromMedicine } from '../lib/logic/requests';
 import { formatDateTime } from '../lib/logic/summaries';
 import type { Dose, Medicine } from '../lib/model/types';
 import { newId, useAuthor, useStore } from '../lib/store/StoreProvider';
 import { now as clock } from '../lib/time';
 import type { PrnCheck } from '../lib/logic/prn';
+import { AskWithThis } from './Requests';
 
 /**
  * Medicines as written on the label. The app records what was given and whether it helped. It
@@ -45,7 +47,8 @@ export function Medicines() {
 }
 
 function MedicineCard({ medicine: m, onEdit }: { medicine: Medicine; onEdit: () => void }) {
-  const { data, save, canWrite } = useStore();
+  const { data, save, canWrite, circle } = useStore();
+  const personName = circle?.personName ?? 'them';
   const author = useAuthor();
   const [check, setCheck] = useState<PrnCheck | null>(null);
   const giving = check !== null;
@@ -140,6 +143,7 @@ function MedicineCard({ medicine: m, onEdit }: { medicine: Medicine; onEdit: () 
           <button className="chip" onClick={() => window.confirm(`Mark ${m.name} as stopped?`) && void save('medicines', { ...m, stopped: true })}>
             Stopped
           </button>
+          <AskWithThis draft={helpFromMedicine(m, personName)} />
         </div>
       ) : null}
     </Card>

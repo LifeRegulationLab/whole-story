@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import { helpFromAppointment } from '../lib/logic/requests';
+import { AskWithThis } from './Requests';
 import { Link, useNavigate, useParams } from 'react-router';
 import { Area, Card, Choice, Empty, Page, Text } from '../components/ui';
 import { calendarFile, openQuestions, ordered, summaryText, toEntry, whenAt } from '../lib/logic/appointments';
@@ -129,6 +131,7 @@ function AppointmentForm({ saved }: { saved: Appointment }) {
                 Add to my calendar
               </button>
             ) : null}
+            {canWrite ? <AskWithThis draft={helpFromAppointment(a, name)} /> : null}
           </Card>
           <Card className="flex flex-col gap-3">
             <h2 className="font-semibold">Questions to ask</h2>

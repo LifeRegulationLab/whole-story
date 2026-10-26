@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { helpFromTask } from '../lib/logic/requests';
 import { MossHome } from '../components/MossCompanion';
 import { MOSS_ACTIONS, MOSS_SETTINGS } from '../lib/moss/actions';
 import { Card, Page } from '../components/ui';
@@ -8,7 +9,7 @@ import { formatDate } from '../lib/logic/summaries';
 import type { CheckIn, Dose } from '../lib/model/types';
 import { newId, useAuthor, useStore } from '../lib/store/StoreProvider';
 import { now as clock, useNow } from '../lib/time';
-import { RequestList } from './Requests';
+import { AskWithThis, RequestList } from './Requests';
 
 export const QUICK = [
   { kind: 'happened', text: 'Something happened' },
@@ -148,7 +149,8 @@ export function Today() {
             {tasks.slice(0, 5).map((t) => (
               <li key={t.id}>
                 {t.title}
-                {t.due ? <span className="muted"> by {formatDate(new Date(t.due).getTime())}</span> : null}
+                {t.due ? <span className="muted"> by {formatDate(new Date(t.due).getTime())}</span> : null}{' '}
+                {canWrite ? <AskWithThis draft={helpFromTask(t)} /> : null}
               </li>
             ))}
           </ul>
